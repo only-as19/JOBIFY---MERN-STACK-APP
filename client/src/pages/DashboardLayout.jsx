@@ -1,34 +1,45 @@
-import { Outlet, redirect, useLoaderData, useNavigate } from "react-router-dom";
-import Wrapper from "../assets/wrappers/Dashboard";
-import { Navbar, SmallSidebar, BigSidebar } from "../components";
-import { useState, createContext, useContext } from "react";
-import { checkDarkTheme } from "../App";
-import customFetch from "../utils/customFetch";
-import { toast } from "react-toastify";
+import {
+  Outlet,
+  redirect,
+  useLoaderData,
+  useNavigate,
+  useNavigation,
+} from 'react-router-dom';
+import Wrapper from '../assets/wrappers/Dashboard';
+import { Navbar, SmallSidebar, BigSidebar, Loading } from '../components';
+import { useState, createContext, useContext } from 'react';
+import { checkDarkTheme } from '../App';
+import customFetch from '../utils/customFetch';
+import { toast } from 'react-toastify';
 
 export const loader = async () => {
   try {
-    const { data } = await customFetch.get('/users/current-user')
-    return data
+    const { data } = await customFetch.get('/users/current-user');
+    return data;
   } catch (error) {
-    return redirect('/')
+    return redirect('/');
   }
-}
+};
 
 const DashboardContext = createContext();
 
 const DashboardLayout = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const navigation = useNavigation();
+  console.log(navigation);
+  
+  const isPageLoading = navigation.state === 'loading';
 
-  const {user} = useLoaderData()
+
+  const { user } = useLoaderData();
   const [showSidebar, setShowSidebar] = useState(false);
   const [isDarkTheme, setIsDarkTheme] = useState(checkDarkTheme());
 
   const toggleTheme = () => {
     const newDarkTheme = !isDarkTheme;
     setIsDarkTheme(newDarkTheme);
-    document.body.classList.toggle("dark-theme", newDarkTheme);
-    localStorage.setItem("darkTheme", newDarkTheme);
+    document.body.classList.toggle('dark-theme', newDarkTheme);
+    localStorage.setItem('darkTheme', newDarkTheme);
   };
 
   const toggleSidebar = () => {
@@ -37,9 +48,9 @@ const DashboardLayout = () => {
   };
 
   const logoutUser = async () => {
-    navigate('/')
-    await customFetch.get('/auth/logout')
-    toast.success('Logging out')
+    navigate('/');
+    await customFetch.get('/auth/logout');
+    toast.success('Logging out');
   };
 
   return (
@@ -54,13 +65,13 @@ const DashboardLayout = () => {
       }}
     >
       <Wrapper>
-        <main className="dashboard">
+        <main className='dashboard'>
           <SmallSidebar />
           <BigSidebar />
           <div>
             <Navbar />
-            <div className="dashboard-page">
-              <Outlet context={{user}}/>
+            <div className='dashboard-page'>
+              {isPageLoading ? <Loading /> : <Outlet context={{ user }} />}
             </div>
           </div>
         </main>

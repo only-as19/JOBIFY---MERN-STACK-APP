@@ -53,7 +53,7 @@ app.use('/api/v1/users', authenticateUser, userRouters);
 app.use('/api/v1/auth', authRouters);
 
 app.get('*splat', (req, res) => {
-  res.sendFile(__dirname,'./client/dist', 'index.html')
+  res.sendFile(path.resolve(__dirname,'./client/dist', 'index.html'))
 })
 
 app.use((req, res) => {
