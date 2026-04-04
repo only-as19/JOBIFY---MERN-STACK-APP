@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import {
   HomeLayout,
   Login,
@@ -12,31 +12,41 @@ import {
   EditJob,
   Stats,
   Profile,
-} from "./pages";
-import { action as registerAction } from './pages/Register'
-import { action as loginAction } from "./pages/Login";
-import { action as addJobAction } from "./pages/AddJob";
-import { loader as DashboardLoader } from "./pages/DashboardLayout";
-import { loader as allJobsLoader } from "./pages/AllJobs";
-import { loader as editJobLoader } from "./pages/EditJob";
-import { action as editJobAction } from "./pages/EditJob";
-import { action as deleteJobAction } from "./pages/DeleteJob";
-import { loader as adminLoader } from "./pages/Admin";
-import { action as profileAction } from "./pages/Profile";
-import { loader as statsLoader } from "./pages/Stats";
+} from './pages';
+import { action as registerAction } from './pages/Register';
+import { action as loginAction } from './pages/Login';
+import { action as addJobAction } from './pages/AddJob';
+import { loader as DashboardLoader } from './pages/DashboardLayout';
+import { loader as allJobsLoader } from './pages/AllJobs';
+import { loader as editJobLoader } from './pages/EditJob';
+import { action as editJobAction } from './pages/EditJob';
+import { action as deleteJobAction } from './pages/DeleteJob';
+import { loader as adminLoader } from './pages/Admin';
+import { action as profileAction } from './pages/Profile';
+import { loader as statsLoader } from './pages/Stats';
+import ErrorComponent from './components/ErrorComponent';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5,
+    },
+  },
+});
 
 export const checkDarkTheme = () => {
-  const isDarkTheme = localStorage.getItem("darkTheme") === "true";
-  document.body.classList.toggle("dark-theme", isDarkTheme);
+  const isDarkTheme = localStorage.getItem('darkTheme') === 'true';
+  document.body.classList.toggle('dark-theme', isDarkTheme);
   return isDarkTheme;
 };
 
-checkDarkTheme()
-
+checkDarkTheme();
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: '/',
     element: <HomeLayout />,
     errorElement: <Error />,
     children: [
@@ -45,55 +55,56 @@ const router = createBrowserRouter([
         element: <Landing />,
       },
       {
-        path: "/register",
+        path: '/register',
         element: <Register />,
-        action:registerAction
+        action: registerAction,
       },
       {
-        path: "/Login",
+        path: '/Login',
         element: <Login />,
-        action:loginAction
+        action: loginAction(queryClient),
       },
       {
-        path: "/Dashboard",
+        path: '/Dashboard',
         element: <Dashboard />,
-        loader: DashboardLoader,
+        loader: DashboardLoader(queryClient),
         children: [
           {
             index: true,
             element: <AddJob />,
-            action: addJobAction
+            action: addJobAction,
           },
           {
-            path: "all-jobs",
+            path: 'all-jobs',
             element: <AllJobs />,
-            loader: allJobsLoader
+            loader: allJobsLoader,
           },
           {
-            path: "profile",
+            path: 'profile',
             element: <Profile />,
-            action: profileAction
+            action: profileAction(queryClient),
           },
           {
-            path: "stats",
+            path: 'stats',
             element: <Stats />,
-            loader: statsLoader
+            loader: statsLoader(queryClient),
+            errorElement: <ErrorComponent/>
           },
           {
-            path: "admin",
+            path: 'admin',
             element: <Admin />,
-            loader: adminLoader
+            loader: adminLoader,
           },
           {
             path: 'edit-job/:id',
             element: <EditJob />,
             action: editJobAction,
-            loader: editJobLoader
+            loader: editJobLoader,
           },
           {
             path: 'delete-job/:id',
-            action: deleteJobAction
-          }
+            action: deleteJobAction,
+          },
         ],
       },
     ],
@@ -103,7 +114,10 @@ const router = createBrowserRouter([
 const App = () => {
   return (
     <>
-      <RouterProvider router={router}/>
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+        <ReactQueryDevtools initialIsOpen={false}/>
+      </QueryClientProvider>
     </>
   );
 };
