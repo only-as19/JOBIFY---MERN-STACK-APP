@@ -7,11 +7,12 @@
   import { FormRowSelect } from '../components';
   import customFetch from '../utils/customFetch';
 
-  export const action = async ({request}) => {
+  export const action =(queryClient) => async ({request}) => {
     const formData = await request.formData()
     const data = Object.fromEntries(formData)
     try {
       await customFetch.post('/jobs', data)
+      await queryClient.invalidateQueries(['jobs'])
       toast.success('Successfully created')
       return redirect('all-jobs')
     } catch (error) {
