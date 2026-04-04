@@ -11,7 +11,7 @@ import { useState, createContext, useContext } from 'react';
 import { checkDarkTheme } from '../App';
 import customFetch from '../utils/customFetch';
 import { toast } from 'react-toastify';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 const queryObject = {
   queryKey: ['user'],
@@ -31,9 +31,9 @@ export const loader = (queryClient) => async () => {
 
 const DashboardContext = createContext();
 
-const DashboardLayout = ({queryClient}) => {
+const DashboardLayout = () => {
+  const queryClient = useQueryClient()
   const { data } = useQuery(queryObject);
-  console.log(data);
   
   const navigate = useNavigate();
   const navigation = useNavigation();
@@ -53,13 +53,12 @@ const DashboardLayout = ({queryClient}) => {
 
   const toggleSidebar = () => {
     setShowSidebar(!showSidebar);
-    console.log(showSidebar);
   };
 
   const logoutUser = async () => {
     navigate('/');
     await customFetch.get('/auth/logout');
-    queryClient.invalidateQueries()
+    await queryClient.invalidateQueries()
     toast.success('Logging out');
   };
 
