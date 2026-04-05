@@ -4,7 +4,7 @@ import morgan from 'morgan';
 import * as dotenv from 'dotenv';
 dotenv.config();
 import helmet from 'helmet';
-import ExpressMongoSanitize from 'express-mongo-sanitize';
+import mongoSanitize from 'express-mongo-sanitize';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import path from 'path';
@@ -21,7 +21,7 @@ import { authenticateUser } from './middleware/authMiddleware.js';
 
 import cloudinary from 'cloudinary';
 
-if ((process.env.NODE_ENV = 'development')) {
+if ((process.env.NODE_ENV === 'development')) {
   app.use(morgan('dev'));
 }
 
@@ -35,8 +35,13 @@ cloudinary.config({
 app.use(express.static(path.resolve(__dirname, './client/dist')));
 app.use(cookieParser());
 app.use(express.json());
-app.use(ExpressMongoSanitize())
-app.use(helmet())
+app.use(helmet({ contentSecurityPolicy: false }));
+app.use((req, res, next) => {
+  mongoSanitize.sanitize(req.body);
+  mongoSanitize.sanitize(req.params);
+  mongoSanitize.sanitize(req.query);
+  next();
+});
 
 
 
