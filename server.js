@@ -3,7 +3,8 @@ const app = express();
 import morgan from 'morgan';
 import * as dotenv from 'dotenv';
 dotenv.config();
-
+import helmet from 'helmet';
+import ExpressMongoSanitize from 'express-mongo-sanitize';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import path from 'path';
@@ -34,6 +35,8 @@ cloudinary.config({
 app.use(express.static(path.resolve(__dirname, './client/dist')));
 app.use(cookieParser());
 app.use(express.json());
+app.use(ExpressMongoSanitize())
+app.use(helmet())
 
 
 
