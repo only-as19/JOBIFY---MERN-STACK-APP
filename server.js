@@ -10,7 +10,6 @@ import path from 'path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-
 import jobRouters from './routers/jobsRouter.js';
 import authRouters from './routers/authRouters.js';
 import userRouters from './routers/userRouters.js';
@@ -20,7 +19,6 @@ import errorHandlerMiddleware from './middleware/errorHandlerMiddleware.js';
 import { authenticateUser } from './middleware/authMiddleware.js';
 
 import cloudinary from 'cloudinary';
-
 
 if ((process.env.NODE_ENV = 'development')) {
   app.use(morgan('dev'));
@@ -32,29 +30,21 @@ cloudinary.config({
   api_secret: process.env.CLOUD_API_SECRET,
 });
 
-app.use(express.static(path.resolve(__dirname,'./client/dist')))
+//middlewares
+app.use(express.static(path.resolve(__dirname, './client/dist')));
 app.use(cookieParser());
 app.use(express.json());
 
-app.post('/', (req, res) => {
-  res.json({ message: 'message delivered', data: req.body });
-});
 
-app.get('/', (req, res) => {
-  res.send('hello');
-});
 
-app.get('/api/v1/test', (req, res) => {
-  res.json({ msg: 'test route' });
-});
-
+//routes
 app.use('/api/v1/jobs', authenticateUser, jobRouters);
 app.use('/api/v1/users', authenticateUser, userRouters);
 app.use('/api/v1/auth', authRouters);
 
 app.get('*splat', (req, res) => {
-  res.sendFile(path.resolve(__dirname,'./client/dist', 'index.html'))
-})
+  res.sendFile(path.resolve(__dirname, './client/dist', 'index.html'));
+});
 
 app.use((req, res) => {
   res.status(404).json({ msg: 'not found' });
